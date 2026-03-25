@@ -425,6 +425,10 @@ function Avatar({ ini, size = 30 }) {
   );
 }
 
+
+// ── MATERIALS DATA ──
+const defMaterials = () => [];
+
 /* ═══════════════════════════════════════════════════════════
    LOGIN
 ═══════════════════════════════════════════════════════════ */
@@ -576,7 +580,7 @@ function LoginScreen({ onLogin }) {
 function Sidebar({ user, tab, setTab, onLogout }) {
   const nav = user.role === 'teacher'
     ? [{id:'turma',icon:'👥',label:'Turma'},{id:'chamada',icon:'📋',label:'Chamada'},{id:'trabalhos',icon:'📝',label:'Trabalhos'}]
-    : [{id:'trabalhos',icon:'✅',label:'Meus Trabalhos'},{id:'frequencia',icon:'📅',label:'Frequência'}];
+    : [{id:'materiais',icon:'📚',label:'Materiais'},{id:'trabalhos',icon:'✅',label:'Meus Trabalhos'},{id:'frequencia',icon:'📅',label:'Frequência'}];
 
   return (
     <div className="sidebar">
@@ -820,6 +824,251 @@ function MyAttendance({ studentId, attendance, classes }) {
 /* ═══════════════════════════════════════════════════════════
    LISTA DA TURMA (teacher)
 ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   MATERIAIS ALUNO - Ultra simple version
+═══════════════════════════════════════════════════════════ */
+function MaterialsGallery({ materials }) {
+  if (!materials) materials = [];
+  
+  return (
+    <div>
+      <div className="ph">
+        <div className="ph-tag">Recursos</div>
+        <div className="ph-title">Materiais de Estudo</div>
+        <div className="ph-sub">PDFs, slides e vídeos da disciplina</div>
+      </div>
+      <div className="pb">
+        {materials.length === 0 ? (
+          <div style={{textAlign:'center', padding:'4rem', color:'#6b7280'}}>
+            <div style={{fontSize:'3rem', marginBottom:'1rem'}}>📚</div>
+            <div style={{fontSize:'1.2rem', fontWeight:600, marginBottom:'.5rem', color:'#374151'}}>
+              Nenhum material disponível
+            </div>
+            <div>O professor ainda não postou materiais nesta disciplina.</div>
+          </div>
+        ) : (
+          <div className="g3">
+            {materials.map(item => (
+              <div key={item.id} className="card">
+                <div className="ch">
+                  <div className="ci ci-n">📄</div>
+                  <div className="ct">{item.title}</div>
+                </div>
+                <div style={{padding:'1rem 1.5rem'}}>
+                  <div style={{fontSize:'.85rem', color:'#6b7280', marginBottom:'1rem'}}>
+                    {item.desc || 'Material de apoio'}
+                  </div>
+                  {item.url ? (
+                    <button 
+                      onClick={() => window.open(item.url, '_blank')}
+                      style={{
+                        width:'100%', padding:'.7rem', background:'#003087', color:'white',
+                        border:'none', borderRadius:'6px', fontWeight:600, cursor:'pointer'
+                      }}>
+                      🔗 Acessar Material
+                    </button>
+                  ) : (
+                    <div style={{
+                      width:'100%', padding:'.7rem', background:'#f3f4f6', color:'#6b7280',
+                      border:'1px solid #e5e7eb', borderRadius:'6px', textAlign:'center'
+                    }}>
+                      🔒 Em breve
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   GERENCIAR MATERIAIS - Ultra simple version
+═══════════════════════════════════════════════════════════ */
+function TeacherMaterials({ materials, setMaterials }) {
+  const [adding, setAdding] = useState(false);
+  const [title, setTitle] = useState('');
+  const [url, setUrl] = useState('');
+  const [desc, setDesc] = useState('');
+  
+  if (!materials) materials = [];
+
+  function addMaterial() {
+    if (!title.trim()) {
+      alert('Digite o título do material');
+      return;
+    }
+    
+    const newItem = {
+      id: Date.now(),
+      title: title.trim(),
+      url: url.trim(),
+      desc: desc.trim(),
+      date: new Date().toLocaleDateString('pt-BR')
+    };
+    
+    setMaterials([newItem, ...materials]);
+    setTitle('');
+    setUrl('');
+    setDesc('');
+    setAdding(false);
+    alert('Material adicionado com sucesso!');
+  }
+
+  function removeMaterial(id) {
+    if (confirm('Remover este material?')) {
+      setMaterials(materials.filter(m => m.id !== id));
+    }
+  }
+
+  return (
+    <div>
+      <div className="ph">
+        <div className="ph-tag">Gerenciamento</div>
+        <div className="ph-title">Materiais da Disciplina</div>
+        <div className="ph-sub">Adicione links para PDFs, vídeos e outros recursos</div>
+      </div>
+      <div className="pb">
+        
+        <button 
+          onClick={() => setAdding(!adding)}
+          style={{
+            padding:'.8rem 1.3rem', background:'#003087', color:'white',
+            border:'none', borderRadius:'6px', fontWeight:600, cursor:'pointer',
+            marginBottom:'2rem'
+          }}>
+          {adding ? '✕ Cancelar' : '+ Adicionar Material'}
+        </button>
+
+        {adding && (
+          <div className="card" style={{marginBottom:'2rem'}}>
+            <div className="ch">
+              <div className="ci ci-n">📄</div>
+              <div className="ct">Novo Material</div>
+            </div>
+            <div style={{padding:'1.5rem'}}>
+              <div style={{marginBottom:'1rem'}}>
+                <label style={{display:'block', fontWeight:600, marginBottom:'.3rem', fontSize:'.9rem'}}>
+                  Título *
+                </label>
+                <input 
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  placeholder="Ex: Slides Aula 01 - Introdução"
+                  style={{
+                    width:'100%', padding:'.7rem', border:'1px solid #d1d5db',
+                    borderRadius:'6px', fontSize:'.9rem'
+                  }}
+                />
+              </div>
+              
+              <div style={{marginBottom:'1rem'}}>
+                <label style={{display:'block', fontWeight:600, marginBottom:'.3rem', fontSize:'.9rem'}}>
+                  Link (URL)
+                </label>
+                <input 
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
+                  placeholder="https://github.com/... ou https://drive.google.com/..."
+                  style={{
+                    width:'100%', padding:'.7rem', border:'1px solid #d1d5db',
+                    borderRadius:'6px', fontSize:'.85rem'
+                  }}
+                />
+              </div>
+              
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block', fontWeight:600, marginBottom:'.3rem', fontSize:'.9rem'}}>
+                  Descrição (opcional)
+                </label>
+                <input 
+                  value={desc}
+                  onChange={e => setDesc(e.target.value)}
+                  placeholder="Ex: Material obrigatório da Semana 3"
+                  style={{
+                    width:'100%', padding:'.7rem', border:'1px solid #d1d5db',
+                    borderRadius:'6px', fontSize:'.85rem'
+                  }}
+                />
+              </div>
+              
+              <button 
+                onClick={addMaterial}
+                style={{
+                  padding:'.8rem 1.3rem', background:'#16a34a', color:'white',
+                  border:'none', borderRadius:'6px', fontWeight:600, cursor:'pointer'
+                }}>
+                ✓ Adicionar Material
+              </button>
+            </div>
+          </div>
+        )}
+
+        {materials.length === 0 ? (
+          <div style={{textAlign:'center', padding:'4rem', color:'#6b7280'}}>
+            <div style={{fontSize:'3rem', marginBottom:'1rem'}}>📁</div>
+            <div style={{fontSize:'1.2rem', fontWeight:600, marginBottom:'.5rem', color:'#374151'}}>
+              Nenhum material cadastrado
+            </div>
+            <div>Clique em "+ Adicionar Material" para começar.</div>
+          </div>
+        ) : (
+          <div className="card">
+            {materials.map((item, index) => (
+              <div key={item.id} style={{
+                display:'flex', alignItems:'center', gap:'1rem',
+                padding:'1.2rem 1.5rem',
+                borderBottom: index < materials.length - 1 ? '1px solid #f3f4f6' : 'none'
+              }}>
+                <div style={{fontSize:'1.8rem'}}>📄</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600, marginBottom:'.2rem'}}>{item.title}</div>
+                  <div style={{fontSize:'.8rem', color:'#6b7280'}}>
+                    {item.date}{item.desc ? ` • ${item.desc}` : ''}
+                  </div>
+                  {item.url && (
+                    <div style={{
+                      fontSize:'.75rem', color:'#2563eb', marginTop:'.3rem',
+                      overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'
+                    }}>
+                      {item.url}
+                    </div>
+                  )}
+                </div>
+                <div style={{display:'flex', gap:'.5rem'}}>
+                  {item.url && (
+                    <button 
+                      onClick={() => window.open(item.url, '_blank')}
+                      style={{
+                        padding:'.4rem .8rem', background:'#2563eb', color:'white',
+                        border:'none', borderRadius:'4px', fontSize:'.8rem', cursor:'pointer'
+                      }}>
+                      🔗 Abrir
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => removeMaterial(item.id)}
+                    style={{
+                      padding:'.4rem .8rem', background:'#ef4444', color:'white',
+                      border:'none', borderRadius:'4px', fontSize:'.8rem', cursor:'pointer'
+                    }}>
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function StudentList({ attendance, deliveries, classes }) {
   return (
     <div>
@@ -1092,13 +1341,14 @@ function WorksControl({ deliveries, setDeliveries, formUrls, setFormUrls }) {
 /* ═══════════════════════════════════════════════════════════
    DASHBOARDS
 ═══════════════════════════════════════════════════════════ */
-function StudentDashboard({ user, onLogout, attendance, deliveries, classes, formUrls }) {
-  const [tab, setTab] = useState('trabalhos');
+function StudentDashboard({ user, onLogout, attendance, deliveries, classes, formUrls, materials }) {
+  const [tab, setTab] = useState('materiais');
   return (
     <div className="layout">
       <Sidebar user={user} tab={tab} setTab={setTab} onLogout={onLogout} />
       <div className="main">
 
+        {tab==='materiais'  && <MaterialsGallery materials={materials || []} />}
         {tab==='trabalhos'  && <MyWorks studentId={user.id} deliveries={deliveries} formUrls={formUrls} user={user} />}
         {tab==='frequencia' && <MyAttendance studentId={user.id} attendance={attendance} classes={classes} />}
       </div>
@@ -1106,7 +1356,7 @@ function StudentDashboard({ user, onLogout, attendance, deliveries, classes, for
   );
 }
 
-function TeacherDashboard({ user, onLogout, attendance, setAttendance, deliveries, setDeliveries, classes, setClasses, formUrls, setFormUrls }) {
+function TeacherDashboard({ user, onLogout, attendance, setAttendance, deliveries, setDeliveries, classes, setClasses, formUrls, setFormUrls, materials, setMaterials }) {
   const [tab, setTab] = useState('turma');
   return (
     <div className="layout">
@@ -1115,6 +1365,7 @@ function TeacherDashboard({ user, onLogout, attendance, setAttendance, deliverie
         {tab==='turma'     && <StudentList attendance={attendance} deliveries={deliveries} classes={classes} />}
         {tab==='chamada'   && <AttendanceRegister attendance={attendance} setAttendance={setAttendance} classes={classes} setClasses={setClasses} />}
         {tab==='trabalhos' && <WorksControl deliveries={deliveries} setDeliveries={setDeliveries} formUrls={formUrls} setFormUrls={setFormUrls} />}
+        {tab==='materiais' && <TeacherMaterials materials={materials || []} setMaterials={setMaterials} />}
 
       </div>
     </div>
@@ -1132,12 +1383,14 @@ function App() {
   const [attendance, setAttendance] = useState(() => load('ufpa_att_v3', defAtt(load('ufpa_classes_v3', INIT_CLASSES))));
   const [deliveries, setDeliveries] = useState(() => load('ufpa_del_v2', defDel()));
   const [formUrls, setFormUrls]     = useState(() => load('ufpa_forms_v3', defForms()));
+  const [materials, setMaterials]   = useState(() => load('ufpa_materials_v1', defMaterials()));
 
 
   useEffect(() => { save('ufpa_classes_v3', classes);    }, [classes]);
   useEffect(() => { save('ufpa_att_v3',     attendance); }, [attendance]);
   useEffect(() => { save('ufpa_del_v2',     deliveries); }, [deliveries]);
   useEffect(() => { save('ufpa_forms_v3',   formUrls);   }, [formUrls]);
+  useEffect(() => { save('ufpa_materials_v1', materials); }, [materials]);
 
 
   // ── Conditional renders AFTER hooks ──
@@ -1145,7 +1398,7 @@ function App() {
 
   if (!user) return <LoginScreen onLogin={setUser} />;
 
-  const props = { user, onLogout: () => setUser(null), attendance, deliveries, classes, formUrls };
+  const props = { user, onLogout: () => setUser(null), attendance, deliveries, classes, formUrls, materials, setMaterials };
 
   if (user.role === 'teacher')
     return <TeacherDashboard {...props} setAttendance={setAttendance} setDeliveries={setDeliveries} setClasses={setClasses} setFormUrls={setFormUrls} />;
