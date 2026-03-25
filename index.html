@@ -1,1 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GestãoAcadêmica</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2744;--navy2:#243358;--navy3:#2e4070;
+  --gold:#c9a227;
+  --cream:#f8f5ee;--bg:#f2efe8;--white:#fff;
+  --text:#1a2744;--muted:#556080;--border:#d4cfc4;
+  --success:#2d7a47;--successBg:#e8f5ee;
+  --warning:#a35c0a;--warningBg:#fdf0e0;
+  --danger:#9b2020;--dangerBg:#fdeaea;
+  --info:#1a5f8c;--infoBg:#e6f3fc;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+h1,h2,h3{font-family:'Crimson Pro',serif}
+button,input,select,textarea{font-family:inherit;font-size:14px}
+table{border-collapse:collapse;width:100%}
+th{text-align:left;font-weight:500}
+.header{background:var(--navy);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100}
+.hbrand{font-family:'Crimson Pro',serif;color:var(--gold);font-size:20px;font-weight:600;display:flex;align-items:center;gap:10px}
+.brole{font-size:10px;padding:2px 9px;border-radius:99px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}
+.bprof{background:var(--gold);color:#fff}.baluno{background:#2d7a47;color:#fff}
+.hright{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.7);font-size:13px}
+.btn-sair{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:7px;padding:5px 14px;cursor:pointer;font-size:12px;font-weight:500}
+.btn-sair:hover{background:rgba(255,255,255,.1)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:24px;flex-wrap:wrap}
+.tab{padding:10px 16px;border:none;background:transparent;color:var(--muted);font-weight:500;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.card{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:1.25rem}
+.cf{background:var(--white);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.sc{background:var(--white);border-radius:10px;border:1px solid var(--border);padding:1rem 1.25rem}
+.sc-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.sc-val{font-family:'Crimson Pro',serif;font-size:28px;font-weight:600;line-height:1}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.gs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gc{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.btn{border:none;border-radius:7px;font-weight:500;cursor:pointer;transition:opacity .15s;padding:7px 18px;font-size:13px}
+.bp{background:var(--navy);color:#fff}.bp:hover{opacity:.88}
+.bg{background:var(--gold);color:#fff}.bg:hover{opacity:.88}
+.bgh{background:transparent;border:1px solid var(--border);color:var(--navy)}.bgh:hover{background:var(--cream)}
+.bsm{padding:4px 12px;font-size:12px}
+.inp{border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:13px;background:#fff;color:var(--text);outline:none;transition:border .15s}
+.inp:focus{border-color:var(--navy)}
+.iw{width:100%}
+.sel{border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:13px;background:#fff;color:var(--text);cursor:pointer;outline:none}
+.tbl-wrap{overflow-x:auto}
+.tbl th{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);background:var(--cream);white-space:nowrap}
+.tbl td{padding:9px 14px;font-size:13px;border-bottom:1px solid var(--border)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--cream)}
+.tbl-foot{padding:9px 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--border)}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-aprovado{background:var(--successBg);color:var(--success)}
+.b-regular{background:var(--infoBg);color:var(--info)}
+.b-pendente{background:var(--warningBg);color:var(--warning)}
+.b-em_risco{background:#fff3e0;color:#b45309}
+.b-reprovado_falta,.b-reprovado_pendencia{background:var(--dangerBg);color:var(--danger)}
+.b-enviado{background:var(--successBg);color:var(--success)}
+.b-atrasado{background:var(--warningBg);color:var(--warning)}
+.b-nao_enviado{background:#f5f5f5;color:#666}
+.pw{background:#e8e8e8;border-radius:99px;height:7px;overflow:hidden}
+.pb{height:100%;border-radius:99px;transition:width .4s}
+#login-page{min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 60%,#1a3a6e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.lh{text-align:center;margin-bottom:32px}
+.lh .ey{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.lh h1{font-size:42px;color:#fff;font-weight:400;line-height:1.1}
+.ld{width:40px;height:3px;background:var(--gold);border-radius:99px;margin:12px auto 0}
+.lc{background:#fff;border-radius:14px;padding:2rem;width:100%;max-width:400px;border:1px solid var(--border)}
+.tr{display:flex;gap:6px;background:var(--cream);border-radius:8px;padding:4px;margin-bottom:24px}
+.trb{flex:1;padding:8px;border:none;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;transition:all .2s}
+.trb.active{background:var(--navy);color:#fff}
+.trb:not(.active){background:transparent;color:var(--muted)}
+.fg{margin-bottom:14px}
+.fl{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+.lhint{margin-top:18px;padding:12px;background:var(--cream);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.9}
+.lhint strong{display:block;margin-bottom:3px;color:var(--text)}
+.err{font-size:12px;color:var(--danger);background:var(--dangerBg);border-radius:6px;padding:7px 12px;margin-bottom:14px}
+.cg{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.ai{padding:10px 12px;border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--border);transition:all .15s}
+.ai.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ai-l{font-size:12px;font-weight:500}
+.ai-c{font-size:11px;opacity:.7;margin-top:2px}
+.pi{display:flex;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;margin:3px 6px;transition:background .15s}
+.pi.presente{background:var(--successBg)}.pi.ausente{background:var(--dangerBg)}
+.pio{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;margin-right:12px;flex-shrink:0}
+.pi.presente .pio{background:var(--success)}.pi.ausente .pio{background:var(--danger)}
+.ps{margin-left:auto;font-size:11px;font-weight:500}
+.pi.presente .ps{color:var(--success)}.pi.ausente .ps{color:var(--danger)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Crimson Pro',serif;font-size:15px;font-weight:600;flex-shrink:0}
+.av-lg{width:58px;height:58px;font-size:20px}
+.mo{position:fixed;inset:0;background:rgba(20,30,60,.45);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
+.mb{background:#fff;border-radius:14px;padding:1.5rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mc{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+.al-danger{padding:10px 14px;border-radius:8px;font-size:13px;background:var(--dangerBg);color:var(--danger);border:1px solid #f5c0c0;margin-bottom:14px}
+.alc{cursor:pointer;transition:box-shadow .15s}.alc:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.mc-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.mc-btn{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--border);background:#fff;color:var(--muted)}
+.mc-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sb{background:none;border:none;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;padding:0}
+.sb:hover{color:var(--text)}
+.ss{border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;outline:none}
+.bc{display:flex;align-items:flex-end;gap:10px;height:120px;padding:0 4px}
+.bcol{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.br{width:100%;border-radius:4px 4px 0 0;transition:height .4s}
+.bl{font-size:11px;color:var(--muted);text-align:center}.bv{font-size:12px;font-weight:500}
+.pl{display:flex;flex-direction:column;gap:8px}
+.pli{display:flex;align-items:center;gap:8px;font-size:13px}
+.pd{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.hidden{display:none!important}
+.flex{display:flex}.fac{align-items:center}.fjsb{justify-content:space-between}
+.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}
+.mb4{margin-bottom:4px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.fw5{font-weight:500}.f12{font-size:12px}.f13{font-size:13px}.f11{font-size:11px}
+.cm{color:var(--muted)}.cs{color:var(--success)}.cd{color:var(--danger)}.cw{color:var(--warning)}
+.tc{text-align:center}
+@media(max-width:700px){.g2{grid-template-columns:1fr}.cg{grid-template-columns:1fr}.tab{font-size:12px;padding:8px 10px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ════════════════════════════════════════════
+// DADOS
+// ════════════════════════════════════════════
+const PROF={login:'adagenor',senha:'SempreViva#2026',name:'Prof. Dr. Adagenor Ribeiro'};
+const MIN=75;
+const STUDS=[
+  {id:1,name:'Ana Beatriz Carvalho',mat:'2021001',login:'ana',pwd:'aluno123'},
+  {id:2,name:'Bruno Figueiredo',mat:'2021002',login:'bruno',pwd:'aluno123'},
+  {id:3,name:'Camila Sousa',mat:'2021003',login:'camila',pwd:'aluno123'},
+  {id:4,name:'Daniel Mota',mat:'2021004',login:'daniel',pwd:'aluno123'},
+  {id:5,name:'Eduarda Pinheiro',mat:'2021005',login:'eduarda',pwd:'aluno123'},
+  {id:6,name:'Felipe Azevedo',mat:'2021006',login:'felipe',pwd:'aluno123'},
+  {id:7,name:'Gabriela Rocha',mat:'2021007',login:'gabriela',pwd:'aluno123'},
+  {id:8,name:'Henrique Lima',mat:'2021008',login:'henrique',pwd:'aluno123'},
+  {id:9,name:'Isabela Martins',mat:'2021009',login:'isabela',pwd:'aluno123'},
+  {id:10,name:'João Victor Santos',mat:'2021010',login:'joao',pwd:'aluno123'},
+  {id:11,name:'Larissa Ferreira',mat:'2021011',login:'larissa',pwd:'aluno123'},
+  {id:12,name:'Marcos Vieira',mat:'2021012',login:'marcos',pwd:'aluno123'},
+  {id:13,name:'Natália Cunha',mat:'2021013',login:'natalia',pwd:'aluno123'},
+  {id:14,name:'Rafael Borges',mat:'2021014',login:'rafael',pwd:'aluno123'},
+  {id:15,name:'Sofia Nascimento',mat:'2021015',login:'sofia',pwd:'aluno123'},
+];
+let ATTEND=[
+  {id:'a1',date:'2025-02-10',lbl:'10/02 – Aula 1',rec:{1:1,2:1,3:1,4:0,5:1,6:1,7:1,8:1,9:0,10:1,11:1,12:1,13:1,14:0,15:1}},
+  {id:'a2',date:'2025-02-17',lbl:'17/02 – Aula 2',rec:{1:1,2:0,3:1,4:1,5:1,6:1,7:0,8:1,9:1,10:1,11:1,12:0,13:1,14:1,15:1}},
+  {id:'a3',date:'2025-02-24',lbl:'24/02 – Aula 3',rec:{1:1,2:1,3:0,4:0,5:1,6:1,7:1,8:0,9:1,10:1,11:0,12:1,13:1,14:1,15:1}},
+  {id:'a4',date:'2025-03-03',lbl:'03/03 – Aula 4',rec:{1:1,2:1,3:1,4:0,5:0,6:1,7:1,8:1,9:1,10:0,11:1,12:1,13:0,14:1,15:1}},
+  {id:'a5',date:'2025-03-10',lbl:'10/03 – Aula 5',rec:{1:1,2:1,3:1,4:0,5:1,6:0,7:1,8:1,9:1,10:1,11:1,12:1,13:1,14:0,15:0}},
+  {id:'a6',date:'2025-03-17',lbl:'17/03 – Aula 6',rec:{1:1,2:0,3:1,4:0,5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:0,13:1,14:1,15:1}},
+  {id:'a7',date:'2025-03-24',lbl:'24/03 – Aula 7',rec:{1:1,2:1,3:1,4:0,5:1,6:1,7:0,8:1,9:0,10:1,11:1,12:1,13:1,14:1,15:1}},
+  {id:'a8',date:'2025-03-31',lbl:'31/03 – Aula 8',rec:{1:1,2:1,3:1,4:0,5:1,6:1,7:1,8:1,9:1,10:1,11:0,12:1,13:1,14:0,15:1}},
+];
+let DELIV={
+  1:{fi:'enviado',fd:'28/02/2025',se:'enviado',sd:'20/03/2025',re:'enviado',rd:'10/04/2025'},
+  2:{fi:'enviado',fd:'02/03/2025',se:'atrasado',sd:'28/03/2025',re:'nao_enviado',rd:''},
+  3:{fi:'enviado',fd:'27/02/2025',se:'enviado',sd:'19/03/2025',re:'enviado',rd:'09/04/2025'},
+  4:{fi:'nao_enviado',fd:'',se:'nao_enviado',sd:'',re:'nao_enviado',rd:''},
+  5:{fi:'enviado',fd:'01/03/2025',se:'enviado',sd:'21/03/2025',re:'atrasado',rd:'15/04/2025'},
+  6:{fi:'atrasado',fd:'10/03/2025',se:'enviado',sd:'22/03/2025',re:'enviado',rd:'11/04/2025'},
+  7:{fi:'enviado',fd:'28/02/2025',se:'enviado',sd:'20/03/2025',re:'enviado',rd:'08/04/2025'},
+  8:{fi:'enviado',fd:'01/03/2025',se:'atrasado',sd:'29/03/2025',re:'enviado',rd:'10/04/2025'},
+  9:{fi:'enviado',fd:'26/02/2025',se:'enviado',sd:'18/03/2025',re:'enviado',rd:'07/04/2025'},
+  10:{fi:'nao_enviado',fd:'',se:'nao_enviado',sd:'',re:'nao_enviado',rd:''},
+  11:{fi:'enviado',fd:'03/03/2025',se:'enviado',sd:'23/03/2025',re:'nao_enviado',rd:''},
+  12:{fi:'atrasado',fd:'12/03/2025',se:'enviado',sd:'21/03/2025',re:'enviado',rd:'12/04/2025'},
+  13:{fi:'enviado',fd:'28/02/2025',se:'enviado',sd:'20/03/2025',re:'enviado',rd:'09/04/2025'},
+  14:{fi:'nao_enviado',fd:'',se:'atrasado',sd:'30/03/2025',re:'nao_enviado',rd:''},
+  15:{fi:'enviado',fd:'27/02/2025',se:'enviado',sd:'19/03/2025',re:'enviado',rd:'08/04/2025'},
+};
+let WORKS=[
+  {id:'w1',name:'Fichamento',desc:'Fichamento crítico de artigo científico sobre o tema da disciplina.',dl:'01/03/2025',fl:'https://forms.google.com'},
+  {id:'w2',name:'Seminário em Grupo',desc:'Apresentação oral em grupo sobre subtema definido pelo professor.',dl:'22/03/2025',fl:'https://forms.google.com'},
+  {id:'w3',name:'Relatório Final Individual',desc:'Relatório reflexivo integrando os conteúdos da disciplina.',dl:'12/04/2025',fl:'https://forms.google.com'},
+];
+let MATS=[
+  {id:'m1',cat:'Artigos',ti:'Metodologia da Pesquisa Científica',de:'Guia introdutório sobre métodos de pesquisa.',lk:'https://doi.org'},
+  {id:'m2',cat:'Artigos',ti:'Epistemologia e Ciência Contemporânea',de:'Artigo de revisão sobre paradigmas científicos.',lk:'https://doi.org'},
+  {id:'m3',cat:'PDFs',ti:'Ementa e Plano de Ensino',de:'Documento oficial com cronograma da disciplina.',lk:'https://drive.google.com'},
+  {id:'m4',cat:'PDFs',ti:'Slides – Aula 1: Introdução',de:'Apresentação da primeira aula.',lk:'https://drive.google.com'},
+  {id:'m5',cat:'PDFs',ti:'Roteiro de Fichamento',de:'Modelo e instruções para elaboração do fichamento.',lk:'https://drive.google.com'},
+  {id:'m6',cat:'Podcasts',ti:'Ciência em Debate – Ep. 12',de:'Discussão sobre ética na pesquisa acadêmica.',lk:'https://open.spotify.com'},
+  {id:'m7',cat:'Podcasts',ti:'Metodologia Viva – Ep. 3',de:'Entrevista com pesquisadores sobre pesquisa qualitativa.',lk:'https://open.spotify.com'},
+  {id:'m8',cat:'Vídeos',ti:'Introdução ao Método Científico',de:'Vídeo-aula de 20 minutos com exemplos práticos.',lk:'https://youtube.com'},
+  {id:'m9',cat:'Vídeos',ti:'Como fazer um Seminário Acadêmico',de:'Orientações para apresentação oral em grupo.',lk:'https://youtube.com'},
+];
 
+// ════════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════════
+let CU=null,TAB='',SID=null,AULA=null;
+let sCol='name',sDir='asc',fSit='todos',fSrch='',fAtv='todos',fDSt='todos',aCat='Artigos';
+
+// ════════════════════════════════════════════
+// UTILITÁRIOS
+// ════════════════════════════════════════════
+function calc(sid){
+  const tot=ATTEND.length;
+  const pres=ATTEND.filter(a=>a.rec[sid]===1).length;
+  const freq=tot>0?Math.round((pres/tot)*100):0;
+  const d=DELIV[sid]||{};
+  const ent=['fi','se','re'].filter(k=>d[k]==='enviado').length;
+  const pend=['fi','se','re'].filter(k=>d[k]==='nao_enviado').length;
+  let sit='regular';
+  if(freq<MIN)sit='reprovado_falta';
+  else if(pend>=2)sit='reprovado_pendencia';
+  else if(pend===1||d.fi==='atrasado'||d.se==='atrasado'||d.re==='atrasado')sit='pendente';
+  else if(freq<80)sit='em_risco';
+  else if(ent===3&&freq>=MIN)sit='aprovado';
+  return{tot,pres,aus:tot-pres,freq,ent,pend,sit};
+}
+const SL={regular:'Regular',pendente:'Pendente',em_risco:'Em Risco',aprovado:'Aprovado',reprovado_falta:'Rep. Falta',reprovado_pendencia:'Rep. Pendência'};
+const DL={enviado:'Enviado',atrasado:'Atrasado',nao_enviado:'Não enviado'};
+const CI={Artigos:'📄',PDFs:'📋',Podcasts:'🎧',Vídeos:'🎬'};
+const SC={regular:'var(--info)',pendente:'var(--warning)',em_risco:'#b45309',aprovado:'var(--success)',reprovado_falta:'var(--danger)',reprovado_pendencia:'var(--danger)'};
+const SB={regular:'var(--infoBg)',pendente:'var(--warningBg)',em_risco:'#fff3e0',aprovado:'var(--successBg)',reprovado_falta:'var(--dangerBg)',reprovado_pendencia:'var(--dangerBg)'};
+const DC={enviado:'var(--successBg)',atrasado:'var(--warningBg)',nao_enviado:'#f5f5f5'};
+const DTC={enviado:'var(--success)',atrasado:'var(--warning)',nao_enviado:'#666'};
+
+function bdg(type,v){
+  if(type==='s')return`<span class="badge b-${v}">${SL[v]||v}</span>`;
+  return`<span class="badge b-${v}">${DL[v]||v}</span>`;
+}
+function pg(v,mx,c){const p=Math.min(100,Math.round((v/mx)*100));return`<div class="pw"><div class="pb" style="width:${p}%;background:${c||'var(--navy)'}"></div></div>`;}
+function av(n,lg){const i=n.split(' ').map(w=>w[0]).slice(0,2).join('');return`<div class="av${lg?' av-lg':''}">${i}</div>`;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function q(sel){return document.querySelector(sel);}
+function qa(sel){return document.querySelectorAll(sel);}
+
+// ════════════════════════════════════════════
+// RENDER RAIZ
+// ════════════════════════════════════════════
+function R(){
+  const app=q('#app');
+  if(!CU){app.innerHTML=rLogin();bLogin();return;}
+  if(CU.role==='p'){app.innerHTML=rProf();bProf();}
+  else{app.innerHTML=rAluno();bAluno();}
+}
+
+// ════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════
+function rLogin(){return`<div id="login-page">
+<div class="lh"><div class="ey">Sistema Acadêmico</div><h1>Gestão de Turma</h1><div class="ld"></div></div>
+<div class="lc">
+  <div class="tr">
+    <button class="trb active" id="btp">Professor</button>
+    <button class="trb" id="bta">Aluno</button>
+  </div>
+  <div class="err hidden" id="lerr"></div>
+  <div class="fg"><label class="fl">Login</label><input class="inp iw" id="ilog" placeholder="adagenor" autocomplete="username"/></div>
+  <div class="fg" style="margin-bottom:20px"><label class="fl">Senha</label><input class="inp iw" id="ipwd" type="password" placeholder="••••••" autocomplete="current-password"/></div>
+  <button class="btn bp iw" id="bent">Entrar</button>
+  <div class="lhint"><strong>Credenciais demo</strong>
+    Professor: <code>adagenor</code> / <code>SempreViva#2026</code><br/>
+    Alunos: primeiro nome minúsculo (ex: <code>ana</code>) / <code>aluno123</code>
+  </div>
+</div></div>`;}
+
+function bLogin(){
+  let role='p';
+  q('#btp').onclick=()=>{role='p';q('#btp').classList.add('active');q('#bta').classList.remove('active');q('#ilog').placeholder='adagenor';};
+  q('#bta').onclick=()=>{role='a';q('#bta').classList.add('active');q('#btp').classList.remove('active');q('#ilog').placeholder='ex: ana';};
+  q('#ipwd').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+  q('#bent').onclick=doLogin;
+  function doLogin(){
+    const lg=q('#ilog').value.trim().toLowerCase(),pw=q('#ipwd').value,er=q('#lerr');
+    if(role==='p'){
+      if(lg===PROF.login&&pw===PROF.senha){CU={role:'p',name:PROF.name};TAB='turma';SID=null;R();}
+      else{er.textContent='Login ou senha incorretos.';er.classList.remove('hidden');}
+    } else {
+      const s=STUDS.find(x=>x.login===lg&&x.pwd===pw);
+      if(s){CU={role:'a',sid:s.id,name:s.name};TAB='perfil';SID=s.id;R();}
+      else{er.textContent='Login ou senha incorretos.';er.classList.remove('hidden');}
+    }
+  }
+}
+
+// ════════════════════════════════════════════
+// HEADER / TABS
+// ════════════════════════════════════════════
+function rHdr(bc,bt){return`<div class="header"><div class="hbrand">GestãoAcadêmica <span class="brole ${bc}">${bt}</span></div><div class="hright"><span>${esc(CU.name)}</span><button class="btn-sair" id="blo">Sair</button></div></div>`;}
+function rTabs(tabs,ac){return`<div class="tabs">${tabs.map(t=>`<button class="tab${ac===t.k?' active':''}" data-tab="${t.k}">${t.l}</button>`).join('')}</div>`;}
+
+// ════════════════════════════════════════════
+// PROFESSOR
+// ════════════════════════════════════════════
+const PT=[{k:'turma',l:'📋 Turma'},{k:'chamada',l:'✅ Chamada'},{k:'trabalhos',l:'📝 Trabalhos'},{k:'entregas',l:'📦 Entregas'},{k:'dashboard',l:'📊 Dashboard'},{k:'materiais',l:'📚 Materiais'}];
+function rProf(){
+  let c='';const t=TAB||'turma';
+  if(t==='turma')c=rTurma();else if(t==='chamada')c=rChamada();else if(t==='trabalhos')c=rTrab();
+  else if(t==='entregas')c=rEntr();else if(t==='dashboard')c=rDash();else if(t==='materiais')c=rMat(true);
+  return rHdr('bprof','Professor')+`<div class="wrap">${rTabs(PT,t)}${c}</div>`;
+}
+function bProf(){
+  q('#blo').onclick=()=>{CU=null;R();};
+  qa('.tab').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;R();});
+  if(TAB==='turma')bTurma();else if(TAB==='chamada')bChamada();
+  else if(TAB==='trabalhos')bTrab();else if(TAB==='entregas')bEntr();
+  else if(TAB==='materiais')bMat(true);
+}
+
+// ── TURMA ──────────────────────────────────
+function rTurma(){
+  let rows=STUDS.map(s=>({...s,...calc(s.id)}));
+  if(fSrch)rows=rows.filter(s=>s.name.toLowerCase().includes(fSrch.toLowerCase()));
+  if(fSit!=='todos')rows=rows.filter(s=>s.sit===fSit);
+  rows.sort((a,b)=>{let va=a[sCol],vb=b[sCol];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return sDir==='asc'?(va>vb?1:-1):(va<vb?1:-1);});
+  function th(c,l){return`<button class="sb" data-sort="${c}">${l} ${sCol===c?(sDir==='asc'?'↑':'↓'):'↕'}</button>`;}
+  return`<div class="flex fac g12 mb20" style="flex-wrap:wrap">
+    <input class="inp" id="tsr" placeholder="Buscar aluno…" value="${esc(fSrch)}" style="min-width:200px"/>
+    <select class="sel" id="tfi">
+      <option value="todos"${fSit==='todos'?' selected':''}>Todas as situações</option>
+      ${Object.entries(SL).map(([k,v])=>`<option value="${k}"${fSit===k?' selected':''}>${v}</option>`).join('')}
+    </select>
+    <button class="btn bgh bsm" id="bcsv" style="margin-left:auto">⬇ CSV</button>
+  </div>
+  <div class="cf"><div class="tbl-wrap"><table class="tbl"><thead><tr>
+    <th>${th('name','Nome')}</th><th>${th('pres','Presenças')}</th><th>${th('freq','Frequência')}</th><th>${th('ent','Entregas')}</th><th>${th('sit','Situação')}</th>
+  </tr></thead><tbody>
+  ${rows.map(r=>`<tr><td class="fw5">${esc(r.name)}</td><td>${r.pres}/${r.tot}</td>
+    <td><div class="flex fac g8"><span class="fw5" style="color:${r.freq<MIN?'var(--danger)':'var(--success)'};min-width:34px">${r.freq}%</span><div style="flex:1;min-width:60px">${pg(r.freq,100,r.freq<MIN?'var(--danger)':r.freq<80?'#e6a817':'var(--success)')}</div></div></td>
+    <td>${r.ent}/3</td><td>${bdg('s',r.sit)}</td></tr>`).join('')}
+  </tbody></table></div><div class="tbl-foot">${rows.length} aluno(s)</div></div>`;
+}
+function bTurma(){
+  q('#tsr').oninput=e=>{fSrch=e.target.value;R();};
+  q('#tfi').onchange=e=>{fSit=e.target.value;R();};
+  qa('.sb').forEach(b=>b.onclick=()=>{const c=b.dataset.sort;if(sCol===c)sDir=sDir==='asc'?'desc':'asc';else{sCol=c;sDir='asc';}R();});
+  q('#bcsv').onclick=()=>{
+    const rows=STUDS.map(s=>({...s,...calc(s.id)}));
+    const h='Nome,Presenças,Ausências,Frequência(%),Entregas,Situação\n';
+    const b=rows.map(r=>`"${r.name}",${r.pres},${r.aus},${r.freq}%,${r.ent}/3,"${SL[r.sit]||r.sit}"`).join('\n');
+    const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(h+b);a.download='turma.csv';a.click();
+  };
+}
+
+// ── CHAMADA ────────────────────────────────
+function rChamada(){
+  if(!AULA&&ATTEND.length>0)AULA=ATTEND[ATTEND.length-1].id;
+  const aula=ATTEND.find(a=>a.id===AULA);
+  const pc=a=>Object.values(a.rec).filter(Boolean).length;
+  const sidebar=[...ATTEND].reverse().map(a=>`<div class="ai${a.id===AULA?' active':''}" data-aula="${a.id}"><div class="ai-l">${esc(a.lbl)}</div><div class="ai-c">${pc(a)}/${STUDS.length} pres.</div></div>`).join('');
+  const lista=aula?STUDS.map(s=>{const p=aula.rec[s.id]===1;return`<div class="pi ${p?'presente':'ausente'}" data-sid="${s.id}"><div class="pio">${p?'✓':'✗'}</div><span class="f13 fw5">${esc(s.name)}</span><span class="ps">${p?'Presente':'Ausente'}</span></div>`;}).join(''):'';
+  return`<div class="cg">
+    <div>
+      <div class="flex fac fjsb mb12"><span class="f12 cm fw5" style="text-transform:uppercase;letter-spacing:.5px">Aulas</span><button class="btn bg bsm" id="bna">+ Nova</button></div>
+      <div class="card mb12 hidden" id="fna" style="padding:12px">
+        <input type="date" class="inp iw mb8" id="ind"/>
+        <button class="btn bp bsm iw" id="bca">Criar Aula</button>
+      </div>
+      <div id="alist">${sidebar}</div>
+    </div>
+    <div class="cf">
+      ${aula?`<div class="flex fac fjsb" style="padding:14px 18px;border-bottom:1px solid var(--border);background:var(--cream)">
+        <div><div style="font-size:15px;font-weight:600">${esc(aula.lbl)}</div><div class="f12 cm mt4">${pc(aula)} pres. · ${STUDS.length-pc(aula)} aus.</div></div>
+        <div class="flex g8"><button class="btn bgh bsm" id="btdp">Todos P</button><button class="btn bgh bsm" id="btda">Todos A</button></div>
+      </div><div style="padding:4px" id="plst">${lista}</div>`
+      :'<div style="padding:40px;text-align:center;color:var(--muted)">Selecione ou crie uma aula</div>'}
+    </div>
+  </div>`;
+}
+function bChamada(){
+  qa('.ai').forEach(el=>el.onclick=()=>{AULA=el.dataset.aula;R();});
+  q('#bna')&&(q('#bna').onclick=()=>q('#fna').classList.toggle('hidden'));
+  q('#bca')&&(q('#bca').onclick=()=>{
+    const dt=q('#ind').value;if(!dt)return;
+    const p=dt.split('-'),lbl=`${p[2]}/${p[1]} – Aula ${ATTEND.length+1}`;
+    const rec={};STUDS.forEach(s=>rec[s.id]=0);
+    const na={id:'a'+Date.now(),date:dt,lbl,rec};ATTEND.push(na);AULA=na.id;R();
+  });
+  qa('.pi').forEach(el=>el.onclick=()=>{
+    const sid=+el.dataset.sid,a=ATTEND.find(x=>x.id===AULA);
+    if(a){a.rec[sid]=a.rec[sid]===1?0:1;R();}
+  });
+  q('#btdp')&&(q('#btdp').onclick=()=>{const a=ATTEND.find(x=>x.id===AULA);if(a){STUDS.forEach(s=>a.rec[s.id]=1);R();}});
+  q('#btda')&&(q('#btda').onclick=()=>{const a=ATTEND.find(x=>x.id===AULA);if(a){STUDS.forEach(s=>a.rec[s.id]=0);R();}});
+}
+
+// ── TRABALHOS ──────────────────────────────
+function rTrab(){
+  const ic={w1:'📄',w2:'👥',w3:'📊'};
+  return`<div class="gc">${WORKS.map(w=>`<div class="card">
+    <div class="flex fac fjsb mb12"><span style="font-size:24px">${ic[w.id]||'📝'}</span><button class="btn bgh bsm" data-ew="${w.id}">✏ Editar</button></div>
+    <h3 style="font-size:16px;margin-bottom:6px">${esc(w.name)}</h3>
+    <p class="f13 cm mb12" style="line-height:1.6">${esc(w.desc)}</p>
+    <div class="f12 cm mb12">📅 Prazo: <strong style="color:var(--text)">${esc(w.dl)}</strong></div>
+    <a href="${esc(w.fl)}" target="_blank" rel="noreferrer" style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:5px 12px;text-decoration:none;color:var(--info)">🔗 Google Forms</a>
+  </div>`).join('')}</div>
+  <div class="mo hidden" id="mw"><div class="mb">
+    <div class="mh"><h3 style="font-size:18px">Editar Trabalho</h3><button class="mc" id="mwc">×</button></div>
+    <input type="hidden" id="ewid"/>
+    <div class="fg"><label class="fl">Nome</label><input class="inp iw" id="ewn"/></div>
+    <div class="fg"><label class="fl">Descrição</label><textarea class="inp iw" id="ewd" style="height:70px;resize:vertical"></textarea></div>
+    <div class="fg"><label class="fl">Prazo</label><input class="inp iw" id="ewdl"/></div>
+    <div class="fg"><label class="fl">Link Google Forms</label><input class="inp iw" id="ewfl"/></div>
+    <div class="flex g8" style="justify-content:flex-end">
+      <button class="btn bgh" id="ewcc">Cancelar</button><button class="btn bp" id="ews">Salvar</button>
+    </div>
+  </div></div>`;
+}
+function bTrab(){
+  qa('[data-ew]').forEach(b=>b.onclick=()=>{
+    const w=WORKS.find(x=>x.id===b.dataset.ew);if(!w)return;
+    q('#ewid').value=w.id;q('#ewn').value=w.name;q('#ewd').value=w.desc;q('#ewdl').value=w.dl;q('#ewfl').value=w.fl;
+    q('#mw').classList.remove('hidden');
+  });
+  q('#mwc').onclick=()=>q('#mw').classList.add('hidden');
+  q('#ewcc').onclick=()=>q('#mw').classList.add('hidden');
+  q('#ews').onclick=()=>{
+    const w=WORKS.find(x=>x.id===q('#ewid').value);if(!w)return;
+    w.name=q('#ewn').value;w.desc=q('#ewd').value;w.dl=q('#ewdl').value;w.fl=q('#ewfl').value;R();
+  };
+}
+
+// ── ENTREGAS ───────────────────────────────
+function rEntr(){
+  let rows=STUDS;
+  if(fSrch)rows=rows.filter(s=>s.name.toLowerCase().includes(fSrch.toLowerCase()));
+  if(fAtv!=='todos'&&fDSt!=='todos'){const km={fi:'fi',se:'se',re:'re'};const k=km[fAtv]||'fi';rows=rows.filter(s=>(DELIV[s.id]?.[k]||'nao_enviado')===fDSt);}
+  const KS=[{k:'fi',l:'Fichamento'},{k:'se',l:'Seminário'},{k:'re',l:'Rel. Final'}];
+  return`<div class="flex g12 mb20" style="flex-wrap:wrap">
+    <input class="inp" id="esr" placeholder="Buscar aluno…" value="${esc(fSrch)}" style="min-width:180px"/>
+    <select class="sel" id="eat">
+      <option value="todos"${fAtv==='todos'?' selected':''}>Todas as atividades</option>
+      <option value="fi"${fAtv==='fi'?' selected':''}>Fichamento</option>
+      <option value="se"${fAtv==='se'?' selected':''}>Seminário</option>
+      <option value="re"${fAtv==='re'?' selected':''}>Relatório</option>
+    </select>
+    <select class="sel" id="est">
+      <option value="todos"${fDSt==='todos'?' selected':''}>Todos os status</option>
+      <option value="enviado"${fDSt==='enviado'?' selected':''}>Enviado</option>
+      <option value="atrasado"${fDSt==='atrasado'?' selected':''}>Atrasado</option>
+      <option value="nao_enviado"${fDSt==='nao_enviado'?' selected':''}>Não enviado</option>
+    </select>
+  </div>
+  <div class="cf"><div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Nome</th>${KS.map(k=>`<th style="text-align:center">${k.l}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(s=>{const d=DELIV[s.id]||{};return`<tr><td class="fw5">${esc(s.name)}</td>${KS.map(({k})=>{const v=d[k]||'nao_enviado';return`<td style="text-align:center"><select class="ss" data-sid="${s.id}" data-key="${k}" style="background:${DC[v]};color:${DTC[v]}"><option value="enviado"${v==='enviado'?' selected':''}>Enviado</option><option value="atrasado"${v==='atrasado'?' selected':''}>Atrasado</option><option value="nao_enviado"${v==='nao_enviado'?' selected':''}>Não enviado</option></select></td>`;}).join('')}</tr>`;}).join('')}
+    </tbody>
+  </table></div><div class="tbl-foot">${rows.length} aluno(s)</div></div>`;
+}
+function bEntr(){
+  q('#esr').oninput=e=>{fSrch=e.target.value;R();};
+  q('#eat').onchange=e=>{fAtv=e.target.value;R();};
+  q('#est').onchange=e=>{fDSt=e.target.value;R();};
+  qa('.ss').forEach(sel=>sel.onchange=()=>{
+    const sid=+sel.dataset.sid,k=sel.dataset.key;
+    if(!DELIV[sid])DELIV[sid]={};DELIV[sid][k]=sel.value;
+    sel.style.background=DC[sel.value];sel.style.color=DTC[sel.value];
+  });
+}
+
+// ── DASHBOARD ──────────────────────────────
+function rDash(){
+  const stats=STUDS.map(s=>({...s,...calc(s.id)}));
+  const tot=STUDS.length;
+  const mf=Math.round(stats.reduce((a,s)=>a+s.freq,0)/tot);
+  const fb=stats.filter(s=>s.freq<MIN).length;
+  const fi=Object.values(DELIV).filter(d=>d.fi==='enviado').length;
+  const se=Object.values(DELIV).filter(d=>d.se==='enviado').length;
+  const re=Object.values(DELIV).filter(d=>d.re==='enviado').length;
+  const ap=stats.filter(s=>s.sit==='aprovado').length;
+  const er=stats.filter(s=>['em_risco','pendente'].includes(s.sit)).length;
+  const rp=stats.filter(s=>s.sit.startsWith('reprovado')).length;
+  const fg=[
+    {l:'≥ 90%',v:stats.filter(s=>s.freq>=90).length,c:'var(--success)'},
+    {l:'75–90%',v:stats.filter(s=>s.freq>=75&&s.freq<90).length,c:'var(--gold)'},
+    {l:'< 75%',v:stats.filter(s=>s.freq<75).length,c:'var(--danger)'},
+  ];
+  const mx=Math.max(...fg.map(g=>g.v),1);
+  const bar=`<div class="bc">${fg.map(g=>`<div class="bcol"><div class="bv" style="color:${g.c}">${g.v}</div><div class="br" style="height:${Math.round((g.v/mx)*90)}px;background:${g.c}"></div><div class="bl">${g.l}</div></div>`).join('')}</div>`;
+  const sd=Object.entries(SL).map(([k,v])=>({k,v,n:stats.filter(s=>s.sit===k).length})).filter(d=>d.n>0);
+  return`<div class="gs mb24">
+    <div class="sc"><div class="sc-lbl">Total de Alunos</div><div class="sc-val">${tot}</div></div>
+    <div class="sc"><div class="sc-lbl">Média de Frequência</div><div class="sc-val" style="color:${mf<MIN?'var(--danger)':'var(--success)'}">${mf}%</div></div>
+    <div class="sc"><div class="sc-lbl">Freq. Abaixo 75%</div><div class="sc-val" style="color:${fb>0?'var(--danger)':'var(--success)'}">${fb}</div><div class="sc-sub">em risco</div></div>
+    <div class="sc"><div class="sc-lbl">Aprovados</div><div class="sc-val" style="color:var(--success)">${ap}</div></div>
+    <div class="sc"><div class="sc-lbl">Em Risco/Pend.</div><div class="sc-val" style="color:var(--warning)">${er}</div></div>
+    <div class="sc"><div class="sc-lbl">Reprovados</div><div class="sc-val" style="color:var(--danger)">${rp}</div></div>
+  </div>
+  <div class="g2 mb20">
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:16px">Entregas por Atividade</h3>
+      ${[{l:'Fichamento',v:fi},{l:'Seminário',v:se},{l:'Rel. Final',v:re}].map(x=>`<div class="mb16"><div class="flex fac fjsb f12 mb4"><span class="cm">${x.l}</span><span class="fw5">${x.v}/${tot}</span></div>${pg(x.v,tot,'var(--navy)')}</div>`).join('')}
+    </div>
+    <div class="card"><h3 style="font-size:15px;margin-bottom:16px">Distribuição de Frequência</h3>${bar}</div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:15px;margin-bottom:16px">Situação da Turma</h3>
+    <div class="flex g20" style="flex-wrap:wrap;align-items:center">
+      ${rPie(sd,tot)}
+      <div class="pl">${sd.map(d=>`<div class="pli"><div class="pd" style="background:${SC[d.k]}"></div><span>${d.v}</span><span class="fw5" style="margin-left:auto;min-width:24px">${d.n}</span><span class="f11 cm" style="min-width:30px">${Math.round(d.n/tot*100)}%</span></div>`).join('')}</div>
+    </div>
+  </div>`;
+}
+function rPie(items,tot){
+  if(!tot||!items.length)return'';
+  let ang=-Math.PI/2;
+  const cx=90,cy=90,r=72,ri=42;
+  const paths=items.map(d=>{
+    const a=(d.n/tot)*2*Math.PI;
+    const x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang);
+    const x2=cx+r*Math.cos(ang+a),y2=cy+r*Math.sin(ang+a);
+    const i1x=cx+ri*Math.cos(ang),i1y=cy+ri*Math.sin(ang);
+    const i2x=cx+ri*Math.cos(ang+a),i2y=cy+ri*Math.sin(ang+a);
+    const lg=a>Math.PI?1:0;
+    const path=`M ${i1x} ${i1y} L ${x1} ${y1} A ${r} ${r} 0 ${lg} 1 ${x2} ${y2} L ${i2x} ${i2y} A ${ri} ${ri} 0 ${lg} 0 ${i1x} ${i1y} Z`;
+    ang+=a;
+    return`<path d="${path}" fill="${SC[d.k]}" stroke="#fff" stroke-width="2"/>`;
+  }).join('');
+  return`<svg width="180" height="180" viewBox="0 0 180 180">${paths}</svg>`;
+}
+
+// ── MATERIAIS ──────────────────────────────
+function rMat(ce){
+  const cats=['Artigos','PDFs','Podcasts','Vídeos'];
+  const items=MATS.filter(m=>m.cat===aCat);
+  return`<div class="mc-cats">
+    ${cats.map(c=>`<button class="mc-btn${aCat===c?' active':''}" data-cat="${c}">${CI[c]} ${c}</button>`).join('')}
+    ${ce?`<button class="btn bg bsm" id="bam" style="margin-left:auto">+ Adicionar</button>`:''}
+  </div>
+  <div class="gc">
+    ${items.length===0?`<div class="cm f13">Nenhum material nesta categoria.</div>`:''}
+    ${items.map(m=>`<div class="card">
+      <div class="flex fac fjsb mb10">
+        <span style="font-size:22px">${CI[m.cat]}</span>
+        ${ce?`<button class="btn bgh bsm" style="color:var(--danger)" data-dm="${m.id}">×</button>`:''}
+      </div>
+      <h3 style="font-size:14px;margin-bottom:6px;line-height:1.4">${esc(m.ti)}</h3>
+      <p class="f12 cm mb12" style="line-height:1.6">${esc(m.de)}</p>
+      <a href="${esc(m.lk)}" target="_blank" rel="noreferrer" style="display:inline-block;font-size:12px;padding:5px 14px;background:var(--navy);color:#fff;border-radius:6px;text-decoration:none">Abrir →</a>
+    </div>`).join('')}
+  </div>
+  ${ce?`<div class="mo hidden" id="mm"><div class="mb">
+    <div class="mh"><h3 style="font-size:18px">Adicionar Material</h3><button class="mc" id="mmc">×</button></div>
+    <div class="fg"><label class="fl">Categoria</label><select class="sel iw" id="mcat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Título</label><input class="inp iw" id="mti"/></div>
+    <div class="fg"><label class="fl">Descrição</label><input class="inp iw" id="mde"/></div>
+    <div class="fg"><label class="fl">Link</label><input class="inp iw" id="mlk" placeholder="https://"/></div>
+    <div class="flex g8" style="justify-content:flex-end">
+      <button class="btn bgh" id="mmca">Cancelar</button><button class="btn bp" id="mms">Adicionar</button>
+    </div>
+  </div></div>`:''}`;
+}
+function bMat(ce){
+  qa('.mc-btn').forEach(b=>b.onclick=()=>{aCat=b.dataset.cat;R();});
+  if(!ce)return;
+  qa('[data-dm]').forEach(b=>b.onclick=()=>{MATS=MATS.filter(m=>m.id!==b.dataset.dm);R();});
+  q('#bam').onclick=()=>q('#mm').classList.remove('hidden');
+  q('#mmc').onclick=()=>q('#mm').classList.add('hidden');
+  q('#mmca').onclick=()=>q('#mm').classList.add('hidden');
+  q('#mms').onclick=()=>{
+    const ti=q('#mti').value.trim();if(!ti)return;
+    MATS.push({id:'m'+Date.now(),cat:q('#mcat').value,ti,de:q('#mde').value,lk:q('#mlk').value});R();
+  };
+}
+
+// ════════════════════════════════════════════
+// ALUNO
+// ════════════════════════════════════════════
+const AT=[{k:'lista',l:'👥 Alunos'},{k:'perfil',l:'👤 Perfil'},{k:'trabalhos',l:'📝 Trabalhos'},{k:'frequencia',l:'📅 Frequência'},{k:'totais',l:'📊 Resumo'},{k:'materiais',l:'📚 Materiais'}];
+function rAluno(){
+  let c='';const t=TAB||'perfil';
+  if(t==='lista')c=rALista();else if(t==='perfil')c=rAPerfil();
+  else if(t==='trabalhos')c=rATrab();else if(t==='frequencia')c=rAFreq();
+  else if(t==='totais')c=rATot();else if(t==='materiais')c=rMat(false);
+  return rHdr('baluno','Aluno')+`<div class="wrap">${rTabs(AT,t)}${c}</div>`;
+}
+function bAluno(){
+  q('#blo').onclick=()=>{CU=null;R();};
+  qa('.tab').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;R();});
+  if(TAB==='lista')bALista();else if(TAB==='materiais')bMat(false);
+}
+function rALista(){
+  const rows=STUDS.filter(s=>s.name.toLowerCase().includes(fSrch.toLowerCase()));
+  return`<input class="inp mb16" id="asr" placeholder="Buscar por nome…" value="${esc(fSrch)}" style="min-width:240px"/>
+  <div class="gc">${rows.map(s=>{const st=calc(s.id);return`<div class="card alc" data-sel="${s.id}">
+    <div class="flex fac g12 mb10">${av(s.name)}<div><div class="f13 fw5">${esc(s.name)}</div><div class="f11 cm">${s.mat}</div></div></div>
+    <div class="flex fac fjsb mb8"><span class="f11 cm">Frequência</span><span class="f12 fw5" style="color:${st.freq<MIN?'var(--danger)':'var(--success)'}">${st.freq}%</span></div>
+    ${bdg('s',st.sit)}
+  </div>`;}).join('')}</div>`;
+}
+function bALista(){
+  q('#asr').oninput=e=>{fSrch=e.target.value;R();};
+  qa('[data-sel]').forEach(el=>el.onclick=()=>{SID=+el.dataset.sel;TAB='perfil';R();});
+}
+function rAPerfil(){
+  if(!SID)return`<div class="tc cm" style="padding:40px">Selecione um aluno na aba "Alunos".</div>`;
+  const s=STUDS.find(x=>x.id===SID),st=calc(s.id),d=DELIV[s.id]||{};
+  return`<div class="g2">
+    <div class="card" style="grid-column:1/-1">
+      <div class="flex fac g16">${av(s.name,'lg')}<div style="flex:1"><h2 style="font-size:22px;margin-bottom:3px">${esc(s.name)}</h2><div class="f12 cm">Matrícula: ${s.mat}</div></div>${bdg('s',st.sit)}</div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:14px">Frequência</h3>
+      <div style="font-family:'Crimson Pro',serif;font-size:38px;font-weight:600;color:${st.freq<MIN?'var(--danger)':'var(--success)'};margin-bottom:8px">${st.freq}%</div>
+      ${pg(st.freq,100,st.freq<MIN?'var(--danger)':'var(--success)')}
+      <div class="flex g20 mt12 f12"><span><span class="cs fw5">${st.pres}</span> presenças</span><span><span class="cd fw5">${st.aus}</span> ausências</span><span><span class="cm">${st.tot}</span> aulas</span></div>
+      ${st.freq<MIN?`<div class="al-danger mt12">⚠ Frequência abaixo do mínimo (${MIN}%)</div>`:''}
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:14px">Atividades</h3>
+      ${[['fi','Fichamento'],['se','Seminário'],['re','Rel. Final']].map(([k,l])=>`<div class="flex fac fjsb mb10"><span class="f13">${l}</span>${bdg('d',d[k]||'nao_enviado')}</div>`).join('')}
+    </div>
+  </div>`;
+}
+function rATrab(){
+  if(!SID)return`<div class="tc cm" style="padding:40px">Selecione um aluno.</div>`;
+  const d=DELIV[SID]||{};
+  const KM={w1:{k:'fi',dk:'fd'},w2:{k:'se',dk:'sd'},w3:{k:'re',dk:'rd'}};
+  return`<div class="gc">${WORKS.map(w=>{const{k,dk}=KM[w.id];const st=d[k]||'nao_enviado',de=d[dk]||'';
+    return`<div class="card">
+      <div class="flex fac fjsb mb12"><h3 style="font-size:15px">${esc(w.name)}</h3>${bdg('d',st)}</div>
+      <p class="f13 cm mb12" style="line-height:1.6">${esc(w.desc)}</p>
+      <div class="f12 cm mb6">Prazo: <strong style="color:var(--text)">${esc(w.dl)}</strong></div>
+      ${de?`<div class="f12 cm mb12">Enviado em: <strong style="color:var(--text)">${esc(de)}</strong></div>`:''}
+      <a href="${esc(w.fl)}" target="_blank" rel="noreferrer" style="display:inline-block;font-size:12px;padding:5px 12px;border:1px solid var(--border);border-radius:6px;text-decoration:none;color:var(--info)">🔗 Formulário</a>
+    </div>`;}).join('')}</div>`;
+}
+function rAFreq(){
+  if(!SID)return`<div class="tc cm" style="padding:40px">Selecione um aluno.</div>`;
+  const s=STUDS.find(x=>x.id===SID),st=calc(s.id);
+  return`<div class="gs mb24">
+    <div class="sc"><div class="sc-lbl">Frequência</div><div class="sc-val" style="color:${st.freq<MIN?'var(--danger)':'var(--success)'}">${st.freq}%</div></div>
+    <div class="sc"><div class="sc-lbl">Presenças</div><div class="sc-val cs">${st.pres}</div></div>
+    <div class="sc"><div class="sc-lbl">Ausências</div><div class="sc-val cd">${st.aus}</div></div>
+    <div class="sc"><div class="sc-lbl">Total de Aulas</div><div class="sc-val">${st.tot}</div></div>
+  </div>
+  ${st.freq<MIN?`<div class="al-danger mb20">⚠ <strong>Atenção:</strong> Frequência abaixo do mínimo (${MIN}%). Risco de reprovação por falta.</div>`:''}
+  <div class="cf">
+    <div style="padding:12px 16px;background:var(--cream);border-bottom:1px solid var(--border)"><h3 style="font-size:15px">Registro por Aula — ${esc(s.name)}</h3></div>
+    <table class="tbl"><thead><tr><th>Aula</th><th>Data</th><th style="text-align:center">Situação</th></tr></thead>
+    <tbody>${ATTEND.map((a,i)=>{const p=a.rec[s.id]===1;return`<tr style="background:${i%2===0?'#fff':'var(--cream)'}">
+      <td>${esc(a.lbl.split('–')[1]?.trim()||a.lbl)}</td>
+      <td>${a.date.split('-').reverse().join('/')}</td>
+      <td style="text-align:center"><span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:500;background:${p?'var(--successBg)':'var(--dangerBg)'};color:${p?'var(--success)':'var(--danger)'}">${p?'Presente':'Ausente'}</span></td>
+    </tr>`;}).join('')}</tbody></table>
+  </div>`;
+}
+function rATot(){
+  if(!SID)return`<div class="tc cm" style="padding:40px">Selecione um aluno.</div>`;
+  const s=STUDS.find(x=>x.id===SID),st=calc(s.id);
+  return`<div class="gs mb24">
+    <div class="sc"><div class="sc-lbl">Frequência</div><div class="sc-val" style="color:${st.freq<MIN?'var(--danger)':'var(--success)'}">${st.freq}%</div></div>
+    <div class="sc"><div class="sc-lbl">Atividades Entregues</div><div class="sc-val">${st.ent}/3</div></div>
+    <div class="sc"><div class="sc-lbl">Pendentes</div><div class="sc-val" style="color:${st.pend>0?'var(--warning)':'var(--success)'}">${st.pend}</div></div>
+    <div class="sc"><div class="sc-lbl">Situação</div><div class="sc-val" style="font-size:20px;color:${SC[st.sit]}">${SL[st.sit]}</div></div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:15px;margin-bottom:16px">Painel Geral — ${esc(s.name)}</h3>
+    <div class="mb16"><div class="flex fac fjsb f13 mb6"><span class="cm">Frequência</span><span class="fw5">${st.freq}% (${st.pres}/${st.tot} aulas)</span></div>${pg(st.freq,100,st.freq<MIN?'var(--danger)':'var(--navy)')}${st.freq<MIN?`<div class="f11 cd mt4">Abaixo do mínimo de ${MIN}%</div>`:''}</div>
+    <div class="mb16"><div class="flex fac fjsb f13 mb6"><span class="cm">Atividades concluídas</span><span class="fw5">${st.ent}/3</span></div>${pg(st.ent,3,'var(--navy)')}</div>
+    <div style="margin-top:20px;padding:12px 16px;background:${SB[st.sit]};border-radius:8px"><span style="font-size:13px;font-weight:500;color:${SC[st.sit]}">Situação Acadêmica: ${SL[st.sit]}</span></div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+R();
+</script>
+</body>
+</html>
