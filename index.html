@@ -326,6 +326,10 @@
     }
 
     .divider-h{display:none}
+
+    .mat-tag.ts{background:#ede9fe;color:#6d28d9}
+    .btn-primary{padding:.6rem 1.2rem;background:var(--navy);color:#fff;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:.88rem}
+    .btn-primary:hover{opacity:.88}
   </style>
 </head>
 <body>
@@ -572,7 +576,7 @@ function LoginScreen({ onLogin }) {
 function Sidebar({ user, tab, setTab, onLogout }) {
   const nav = user.role === 'teacher'
     ? [{id:'turma',icon:'👥',label:'Turma'},{id:'chamada',icon:'📋',label:'Chamada'},{id:'trabalhos',icon:'📝',label:'Trabalhos'}]
-    : [{id:'materiais',icon:'📚',label:'Materiais'},{id:'trabalhos',icon:'✅',label:'Meus Trabalhos'},{id:'frequencia',icon:'📅',label:'Frequência'}];
+    : [{id:'trabalhos',icon:'✅',label:'Meus Trabalhos'},{id:'frequencia',icon:'📅',label:'Frequência'}];
 
   return (
     <div className="sidebar">
@@ -600,10 +604,21 @@ function Sidebar({ user, tab, setTab, onLogout }) {
 /* ═══════════════════════════════════════════════════════════
    MATERIAIS (student)
 ═══════════════════════════════════════════════════════════ */
-function MaterialsGallery() {
+function MaterialsGallery({ materials }) {
   const [filter, setFilter] = useState('all');
-  const conf = { pdf:{tag:'tp',lbl:'PDF',ico:'📄'}, article:{tag:'ta',lbl:'Artigo',ico:'📰'}, video:{tag:'tv',lbl:'Vídeo',ico:'🎬'} };
-  const filtered = filter==='all' ? MATERIALS : MATERIALS.filter(m=>m.type===filter);
+  const conf = {
+    pdf:     { tag:'tp', lbl:'PDF',    ico:'📄', btn:'⬇️ Baixar',   action:'download' },
+    article: { tag:'ta', lbl:'Artigo', ico:'📰', btn:'🔗 Acessar',  action:'open'     },
+    video:   { tag:'tv', lbl:'Vídeo',  ico:'🎬', btn:'▶️ Assistir', action:'open'     },
+    slides:  { tag:'ts', lbl:'Slides', ico:'📊', btn:'⬇️ Baixar',   action:'download' },
+  };
+
+  const filtered = filter==='all' ? materials : materials.filter(m=>m.type===filter);
+
+  function openMaterial(m) {
+    if (!m.url) return alert('Link não disponível ainda.');
+    window.open(m.url, '_blank');
+  }
 
   return (
     <div>
@@ -614,25 +629,42 @@ function MaterialsGallery() {
       </div>
       <div className="pb">
         <div className="filter-bar">
-          {['all','pdf','article','video'].map(t => (
+          {['all','pdf','slides','article','video'].map(t => (
             <button key={t} className="btn-outline"
               style={filter===t?{borderColor:'var(--navy)',background:'rgba(29,44,72,.08)',fontWeight:600}:{}}
               onClick={() => setFilter(t)}>
-              {t==='all'?'Todos':conf[t].lbl}
+              {t==='all'?'Todos':conf[t]?.lbl||t}
             </button>
           ))}
         </div>
-        <div className="card" style={{overflow:'hidden'}}>
-          <div className="mat-grid">
-            {filtered.map(m => (
-              <div key={m.id} className="mat-card" onClick={() => alert(`Abrindo: ${m.title}`)}>
-                <span className={`mat-tag ${conf[m.type].tag}`}>{conf[m.type].ico} {conf[m.type].lbl}</span>
-                <div className="mat-title">{m.title}</div>
-                <div className="mat-meta">{m.meta}</div>
-              </div>
-            ))}
+        {filtered.length === 0 ? (
+          <div className="card" style={{padding:'3rem',textAlign:'center',color:'var(--muted)'}}>
+            <div style={{fontSize:'2.5rem',marginBottom:'1rem'}}>📭</div>
+            <div style={{fontWeight:600,marginBottom:'.4rem'}}>Nenhum material disponível</div>
+            <div style={{fontSize:'.85rem'}}>O professor ainda não postou materiais nesta categoria.</div>
           </div>
-        </div>
+        ) : (
+          <div className="card" style={{overflow:'hidden'}}>
+            <div className="mat-grid">
+              {filtered.map(m => {
+                const c = conf[m.type] || conf['article'];
+                return (
+                  <div key={m.id} className="mat-card">
+                    <span className={`mat-tag ${c.tag}`}>{c.ico} {c.lbl}</span>
+                    <div className="mat-title">{m.title}</div>
+                    {m.desc && <div className="mat-meta" style={{marginBottom:'.5rem'}}>{m.desc}</div>}
+                    <div className="mat-meta">{m.date}</div>
+                    <button
+                      onClick={() => openMaterial(m)}
+                      style={{marginTop:'.8rem',width:'100%',padding:'.5rem',background:m.url?'var(--navy)':'var(--border)',color:m.url?'#fff':'var(--muted)',border:'none',borderRadius:6,fontSize:'.8rem',fontWeight:600,cursor:m.url?'pointer':'default'}}>
+                      {m.url ? c.btn : '🔒 Em breve'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1061,12 +1093,12 @@ function WorksControl({ deliveries, setDeliveries, formUrls, setFormUrls }) {
    DASHBOARDS
 ═══════════════════════════════════════════════════════════ */
 function StudentDashboard({ user, onLogout, attendance, deliveries, classes, formUrls }) {
-  const [tab, setTab] = useState('materiais');
+  const [tab, setTab] = useState('trabalhos');
   return (
     <div className="layout">
       <Sidebar user={user} tab={tab} setTab={setTab} onLogout={onLogout} />
       <div className="main">
-        {tab==='materiais'  && <MaterialsGallery />}
+
         {tab==='trabalhos'  && <MyWorks studentId={user.id} deliveries={deliveries} formUrls={formUrls} user={user} />}
         {tab==='frequencia' && <MyAttendance studentId={user.id} attendance={attendance} classes={classes} />}
       </div>
@@ -1083,6 +1115,7 @@ function TeacherDashboard({ user, onLogout, attendance, setAttendance, deliverie
         {tab==='turma'     && <StudentList attendance={attendance} deliveries={deliveries} classes={classes} />}
         {tab==='chamada'   && <AttendanceRegister attendance={attendance} setAttendance={setAttendance} classes={classes} setClasses={setClasses} />}
         {tab==='trabalhos' && <WorksControl deliveries={deliveries} setDeliveries={setDeliveries} formUrls={formUrls} setFormUrls={setFormUrls} />}
+
       </div>
     </div>
   );
@@ -1100,10 +1133,12 @@ function App() {
   const [deliveries, setDeliveries] = useState(() => load('ufpa_del_v2', defDel()));
   const [formUrls, setFormUrls]     = useState(() => load('ufpa_forms_v3', defForms()));
 
+
   useEffect(() => { save('ufpa_classes_v3', classes);    }, [classes]);
   useEffect(() => { save('ufpa_att_v3',     attendance); }, [attendance]);
   useEffect(() => { save('ufpa_del_v2',     deliveries); }, [deliveries]);
   useEffect(() => { save('ufpa_forms_v3',   formUrls);   }, [formUrls]);
+
 
   // ── Conditional renders AFTER hooks ──
   if (!unlocked) return <PasswordScreen onUnlock={() => { sessionStorage.setItem('naea_unlocked','1'); setUnlocked(true); }} />;
