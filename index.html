@@ -1032,8 +1032,19 @@ function toast(msg) {
 // ── Formatação ───────────────────────────────────────────────────────
 function fmt(e, cmd) {
     e.preventDefault();
-    restoreSelection();
+    // Restaura foco e seleção antes de aplicar formatação
+    if (lastFocus) {
+        lastFocus.focus();
+        if (lastSel) {
+            var s = window.getSelection();
+            s.removeAllRanges();
+            s.addRange(lastSel);
+        }
+    }
     document.execCommand(cmd, false, null);
+    // Salva seleção após formatação
+    var s2 = window.getSelection();
+    if (s2 && s2.rangeCount) lastSel = s2.getRangeAt(0).cloneRange();
     atualizaToolbar();
 }
 
@@ -1550,18 +1561,53 @@ function atualizaCabecalhoRodape() {
 // ── Fonte e tamanho ──────────────────────────────────────────────────
 function mudaFonte(sel) {
     var fonte = sel.value;
+    var nomeFonte = fonte.split(',')[0].replace(/'/g,'').trim();
+
+    // Se há texto selecionado, aplica só na seleção
+    if (lastFocus && lastSel) {
+        lastFocus.focus();
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(lastSel);
+        if (s.toString().trim()) {
+            document.execCommand('fontName', false, nomeFonte);
+            lastSel = s.getRangeAt(0).cloneRange();
+            return;
+        }
+    }
+    // Sem seleção: aplica na página inteira como fonte padrão
     pageList.forEach(function(ed) {
         ed.style.fontFamily = fonte;
     });
-    // Aplica também ao texto selecionado se houver
-    restoreSelection();
-    if (window.getSelection().toString()) {
-        document.execCommand('fontName', false, fonte.split(',')[0].replace(/'/g,''));
-    }
 }
 
 function mudaTamanho(sel) {
-    var tam = sel.value;
+    var tam   = sel.value;
+    var ptVal = parseInt(tam); // px to pt approx mapping
+    // execCommand fontSize uses 1-7 scale — map px to closest
+    var scaleMap = {'11px':1,'12px':2,'14px':3,'16px':4,'18px':5,'22px':6,'28px':7};
+    var fsCmd    = scaleMap[tam] || 3;
+
+    // Se há texto selecionado, aplica só na seleção
+    if (lastFocus && lastSel) {
+        lastFocus.focus();
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(lastSel);
+        if (s.toString().trim()) {
+            document.execCommand('fontSize', false, fsCmd);
+            // Corrige o tamanho real via style nos spans gerados
+            if (lastFocus) {
+                lastFocus.querySelectorAll('font[size]').forEach(function(f) {
+                    f.removeAttribute('size');
+                    f.style.fontSize = tam;
+                });
+            }
+            lastSel = s.getRangeAt(0).cloneRange();
+            return;
+        }
+    }
+    // Sem seleção: aplica na página inteira
     pageList.forEach(function(ed) {
         ed.style.fontSize = tam;
     });
