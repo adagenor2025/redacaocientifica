@@ -394,10 +394,10 @@ function bTurma(){
 
 // ── CHAMADA ────────────────────────────────
 function rChamada(){
-  if(!AULA&&ATTEND.length>0)AULA=ATTEND[ATTEND.length-1].id;
+  if(!AULA&&ATTEND.length>0)AULA=ATTEND[0].id;
   const aula=ATTEND.find(a=>a.id===AULA);
   const pc=a=>Object.values(a.rec).filter(Boolean).length;
-  const sidebar=[...ATTEND].reverse().map(a=>`<div class="ai${a.id===AULA?' active':''}" data-aula="${a.id}"><div class="ai-l">${esc(a.lbl)}</div><div class="ai-c">${pc(a)}/${STUDS.length} pres.</div></div>`).join('');
+  const sidebar=[...ATTEND].map(a=>`<div class="ai${a.id===AULA?' active':''}" data-aula="${a.id}" style="background:${a.id===AULA?'#0d3333':'#1B5E5E'};color:#fff;border:1px solid #144848"><div style="font-size:12px;font-weight:500;color:#fff">${esc(a.lbl)}</div><div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:2px">${pc(a)}/${STUDS.length} pres.</div></div>`).join('');
   const lista=aula?STUDS.map(s=>{const p=aula.rec[s.id]===1;return`<div class="pi ${p?'presente':'ausente'}" data-sid="${s.id}"><div class="pio">${p?'✓':'✗'}</div><span class="f13 fw5">${esc(s.name)}</span><span class="ps">${p?'Presente':'Ausente'}</span></div>`;}).join(''):'';
   return`<div class="cg">
     <div>
